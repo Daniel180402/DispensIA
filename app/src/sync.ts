@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { db } from './db'
+import { apiUrl } from './settings'
 import type { Item } from './types'
 
 export type SyncState = 'idle' | 'syncing' | 'online' | 'offline'
@@ -32,7 +33,7 @@ export async function syncNow(): Promise<boolean> {
   try {
     const since = (await db.meta.get('lastSync'))?.value ?? 0
     const dirty = await db.items.where('dirty').equals(1).toArray()
-    const res = await fetch('/api/sync', {
+    const res = await fetch(apiUrl('/api/sync'), {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
