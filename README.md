@@ -18,6 +18,7 @@ If two phones edit the same product, the most recent change wins (last-write-win
 - Quick quantity changes with the +/- buttons
 - Search and filters
 - Installable on iOS and Android from the browser (Add to Home Screen)
+- AI recipe suggestions based on what's actually in your pantry, powered by a local model via Ollama (no cloud, no API keys)
 - Dark mode
 
 ## Stack
@@ -27,6 +28,7 @@ If two phones edit the same product, the most recent change wins (last-write-win
 | App | React 19, TypeScript, Vite, Tailwind CSS v4, Dexie (IndexedDB), vite-plugin-pwa (Workbox) |
 | Android | Capacitor 7 |
 | Server | Node 22, Hono, SQLite (better-sqlite3) |
+| AI | Ollama with local Hugging Face models (default: qwen2.5:7b) |
 | Deploy | Docker, docker-compose |
 
 ## Run with Docker
@@ -74,6 +76,21 @@ JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" ./gradle
 
 The APK ends up in `app/android/app/build/outputs/apk/debug/app-debug.apk`. Copy it to the phone, install it, then open the settings (gear icon) and set the server address, for example `http://192.168.1.10:8080`.
 
+## AI recipes (local)
+
+The Recipes tab asks a local LLM what you can cook with what you actually have at home. Everything runs on your machine through [Ollama](https://ollama.com): no cloud, no API keys, no data leaving your network. The last suggestions are cached on the phone, so you can read them offline too.
+
+The docker-compose already includes an Ollama service. After the first start, download the model (about 4.7 GB, one time only):
+
+```bash
+docker compose exec ollama ollama pull qwen2.5:7b
+```
+
+Two optional settings in a `.env` file next to the compose:
+
+- `OLLAMA_MODEL`: use a different model (any chat model from the Ollama library works, e.g. `llama3.1:8b`, `gemma2:9b`)
+- `OLLAMA_URL`: point to an Ollama running elsewhere. On a Mac the native Ollama app is much faster than the Docker one because it uses the GPU, so: `OLLAMA_URL=http://host.docker.internal:11434`
+
 ## Development
 
 ```bash
@@ -92,7 +109,6 @@ npm run dev:app      # Vite on :5173 (proxy /api to :3000)
 
 ## Roadmap
 
-- AI recipe suggestions based on what's in the pantry (the "IA" in the name)
 - Barcode scanning
 - Notifications for products about to expire
 
@@ -118,6 +134,7 @@ Se due telefoni modificano lo stesso prodotto, vince la modifica più recente (l
 - Quantità modificabili al volo con i pulsanti +/-
 - Ricerca e filtri
 - Installabile su iOS e Android dal browser (Aggiungi a schermata Home)
+- Ricette suggerite dall'IA in base a quello che hai davvero in casa, con un modello locale via Ollama (niente cloud, niente chiavi API)
 - Dark mode
 
 ## Avvio con Docker
@@ -165,6 +182,21 @@ JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" ./gradle
 
 L'APK finisce in `app/android/app/build/outputs/apk/debug/app-debug.apk`. Copialo sul telefono, installalo, poi apri le impostazioni (icona ingranaggio) e imposta l'indirizzo del server, per esempio `http://192.168.1.10:8080`.
 
+## Ricette IA (in locale)
+
+La tab Ricette chiede a un LLM locale cosa puoi cucinare con quello che hai davvero in casa. Gira tutto sulla tua macchina tramite [Ollama](https://ollama.com): niente cloud, niente chiavi API, nessun dato esce dalla tua rete. Gli ultimi suggerimenti restano in cache sul telefono, quindi li puoi rileggere anche offline.
+
+Il docker-compose include già un servizio Ollama. Dopo il primo avvio, scarica il modello (circa 4.7 GB, una volta sola):
+
+```bash
+docker compose exec ollama ollama pull qwen2.5:7b
+```
+
+Due impostazioni opzionali nel file `.env` accanto al compose:
+
+- `OLLAMA_MODEL`: usa un modello diverso (va bene qualsiasi modello chat della libreria Ollama, es. `llama3.1:8b`, `gemma2:9b`)
+- `OLLAMA_URL`: punta a un Ollama che gira altrove. Su Mac l'app nativa di Ollama è molto più veloce di quella in Docker perché usa la GPU, quindi: `OLLAMA_URL=http://host.docker.internal:11434`
+
 ## Sviluppo
 
 ```bash
@@ -175,6 +207,5 @@ npm run dev:app      # Vite su :5173 (proxy /api verso :3000)
 
 ## Roadmap
 
-- Ricette suggerite dall'IA in base a cosa c'è in dispensa (la "IA" del nome)
 - Scansione dei codici a barre
 - Notifiche per i prodotti in scadenza
