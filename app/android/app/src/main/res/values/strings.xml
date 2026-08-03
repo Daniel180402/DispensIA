@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">DispensIA</string>
+    <string name="title_activity_main">DispensIA</string>
+    <string name="package_name">it.daniel.dispensia</string>
+    <string name="custom_url_scheme">it.daniel.dispensia</string>
+</resources>
