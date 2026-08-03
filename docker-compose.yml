@@ -1,0 +1,14 @@
+services:
+  dispensia:
+    build: .
+    container_name: dispensia
+    restart: unless-stopped
+    ports:
+      - '8080:3000'   # HTTP
+      - '8443:3443'   # HTTPS (serve per la PWA offline sui telefoni)
+    volumes:
+      - dispensia-data:/data
+      - ./certs:/certs:ro
+
+volumes:
+  dispensia-data:
