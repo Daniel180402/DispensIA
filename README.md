@@ -25,6 +25,7 @@ If two phones edit the same product, the most recent change wins (last-write-win
 | Part | Tech |
 | --- | --- |
 | App | React 19, TypeScript, Vite, Tailwind CSS v4, Dexie (IndexedDB), vite-plugin-pwa (Workbox) |
+| Android | Capacitor 7 |
 | Server | Node 22, Hono, SQLite (better-sqlite3) |
 | Deploy | Docker, docker-compose |
 
@@ -57,6 +58,21 @@ Note: service workers (the part that makes the app work offline) require HTTPS. 
 4. iOS: Share > Add to Home Screen. Android: Chrome will offer to install the app.
 
 That's it: the app is on your home screen, works offline and syncs by itself when you are at home.
+
+## Android APK
+
+If you prefer a native Android app instead of the PWA (no certificates needed, offline out of the box), you can build the APK with Capacitor. You need Android Studio installed.
+
+```bash
+npm install
+npm run build -w app
+cd app
+npx cap sync android
+cd android
+JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" ./gradlew assembleDebug
+```
+
+The APK ends up in `app/android/app/build/outputs/apk/debug/app-debug.apk`. Copy it to the phone, install it, then open the settings (gear icon) and set the server address, for example `http://192.168.1.10:8080`.
 
 ## Development
 
@@ -133,6 +149,21 @@ Nota: i service worker (la parte che fa funzionare l'app offline) richiedono HTT
 4. iOS: Condividi > Aggiungi a schermata Home. Android: Chrome propone di installare l'app.
 
 Fatto: l'app è sulla home, funziona offline e si sincronizza da sola quando sei a casa.
+
+## APK Android
+
+Se preferisci un'app Android nativa al posto della PWA (niente certificati, offline senza configurazione), puoi compilare l'APK con Capacitor. Serve Android Studio installato.
+
+```bash
+npm install
+npm run build -w app
+cd app
+npx cap sync android
+cd android
+JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" ./gradlew assembleDebug
+```
+
+L'APK finisce in `app/android/app/build/outputs/apk/debug/app-debug.apk`. Copialo sul telefono, installalo, poi apri le impostazioni (icona ingranaggio) e imposta l'indirizzo del server, per esempio `http://192.168.1.10:8080`.
 
 ## Sviluppo
 
