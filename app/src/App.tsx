@@ -40,7 +40,9 @@ export default function App() {
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing] = useState<Item | null>(null)
 
-  const items = useLiveQuery(() => db.items.where('deleted').notEqual(1).sortBy('name'), []) ?? []
+  const items = (useLiveQuery(() => db.items.orderBy('name').toArray(), []) ?? []).filter(
+    (i) => i.deleted === 0
+  )
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
