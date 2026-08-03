@@ -2,6 +2,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { useMemo, useState } from 'react'
 import ItemCard from './components/ItemCard'
 import ItemForm from './components/ItemForm'
+import SettingsSheet from './components/SettingsSheet'
 import ShoppingView from './components/ShoppingView'
 import { db } from './db'
 import { syncNow, useSyncStatus } from './sync'
@@ -39,6 +40,7 @@ export default function App() {
   const [locationFilter, setLocationFilter] = useState<ItemLocation | null>(null)
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing] = useState<Item | null>(null)
+  const [settingsOpen, setSettingsOpen] = useState(false)
 
   const items = (useLiveQuery(() => db.items.orderBy('name').toArray(), []) ?? []).filter(
     (i) => i.deleted === 0
@@ -77,7 +79,16 @@ export default function App() {
           <h1 className="text-xl font-bold tracking-tight">
             Dispens<span className="text-emerald-400">IA</span>
           </h1>
-          <SyncPill />
+          <div className="flex items-center gap-2">
+            <SyncPill />
+            <button
+              className="grid size-8 place-items-center rounded-full bg-zinc-900 text-sm active:bg-zinc-800"
+              onClick={() => setSettingsOpen(true)}
+              aria-label="Impostazioni"
+            >
+              ⚙️
+            </button>
+          </div>
         </div>
       </header>
 
@@ -181,6 +192,7 @@ export default function App() {
       </nav>
 
       {formOpen && <ItemForm item={editing} onClose={() => setFormOpen(false)} />}
+      {settingsOpen && <SettingsSheet onClose={() => setSettingsOpen(false)} />}
     </div>
   )
 }
