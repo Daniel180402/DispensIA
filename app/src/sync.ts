@@ -20,10 +20,6 @@ function setStatus(next: Partial<SyncStatus>) {
   listeners.forEach((l) => l(status))
 }
 
-db.meta.get('lastSync').then((entry) => {
-  if (entry) setStatus({ lastSync: entry.value })
-})
-
 let syncing = false
 
 export async function syncNow(): Promise<boolean> {
@@ -95,6 +91,10 @@ export function scheduleSync(delayMs = 1500) {
 // Sincronizza in automatico: all'avvio, dopo ogni modifica, quando l'app torna
 // in primo piano, quando torna la rete e comunque ogni 30 secondi se visibile
 export function startAutoSync() {
+  // mostra l'orario dell'ultimo sync anche se ora siamo offline
+  void db.meta.get('lastSync').then((entry) => {
+    if (entry && status.lastSync === null) setStatus({ lastSync: entry.value })
+  })
   void syncNow()
   window.addEventListener('online', () => void syncNow())
   document.addEventListener('visibilitychange', () => {
