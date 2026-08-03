@@ -91,7 +91,7 @@ export default function RecipesView() {
     try {
       const res = await fetch(apiUrl('/api/recipes'), {
         method: 'POST',
-        signal: AbortSignal.timeout(120_000),
+        signal: AbortSignal.timeout(300_000),
       })
       const data = await res.json()
       if (!res.ok) {

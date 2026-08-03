@@ -2,13 +2,14 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { useMemo, useState } from 'react'
 import ItemCard from './components/ItemCard'
 import ItemForm from './components/ItemForm'
+import RecipesView from './components/RecipesView'
 import SettingsSheet from './components/SettingsSheet'
 import ShoppingView from './components/ShoppingView'
 import { db } from './db'
 import { syncNow, useSyncStatus } from './sync'
 import { LOCATIONS, type Item, type ItemLocation } from './types'
 
-type Tab = 'pantry' | 'shopping'
+type Tab = 'pantry' | 'shopping' | 'recipes'
 
 function SyncPill() {
   const { state, lastSync } = useSyncStatus()
@@ -146,8 +147,10 @@ export default function App() {
               ))
             )}
           </>
-        ) : (
+        ) : tab === 'shopping' ? (
           <ShoppingView items={items} />
+        ) : (
+          <RecipesView />
         )}
       </main>
 
@@ -187,6 +190,14 @@ export default function App() {
               )}
             </span>
             Spesa
+          </button>
+          <button
+            className={`flex flex-1 flex-col items-center gap-0.5 py-3 text-xs font-medium ${
+              tab === 'recipes' ? 'text-emerald-400' : 'text-zinc-500'
+            }`}
+            onClick={() => setTab('recipes')}
+          >
+            <span className="text-xl">🍳</span> Ricette
           </button>
         </div>
       </nav>
