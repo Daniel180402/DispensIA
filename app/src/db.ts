@@ -1,4 +1,5 @@
 import Dexie, { type EntityTable } from 'dexie'
+import { scheduleSync } from './sync'
 import type { Item, ItemLocation } from './types'
 
 interface MetaEntry {
@@ -36,16 +37,19 @@ export async function createItem(draft: ItemDraft): Promise<string> {
     deleted: 0,
     dirty: 1,
   })
+  scheduleSync()
   return id
 }
 
 export async function updateItem(id: string, patch: Partial<Item>): Promise<void> {
   await db.items.update(id, { ...patch, updatedAt: Date.now(), dirty: 1 })
+  scheduleSync()
 }
 
 export async function removeItem(id: string): Promise<void> {
   // soft delete: la cancellazione deve propagarsi agli altri telefoni
   await db.items.update(id, { deleted: 1, updatedAt: Date.now(), dirty: 1 })
+  scheduleSync()
 }
 
 export async function changeQuantity(item: Item, delta: number): Promise<void> {

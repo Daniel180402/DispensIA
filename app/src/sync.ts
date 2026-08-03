@@ -84,11 +84,23 @@ export function useSyncStatus(): SyncStatus {
   return current
 }
 
-// Sincronizza in automatico: all'avvio, quando l'app torna in primo piano e quando torna la rete
+// Sync ritardato e raggruppato: chiamato dopo ogni modifica locale
+let syncTimer: ReturnType<typeof setTimeout> | undefined
+
+export function scheduleSync(delayMs = 1500) {
+  clearTimeout(syncTimer)
+  syncTimer = setTimeout(() => void syncNow(), delayMs)
+}
+
+// Sincronizza in automatico: all'avvio, dopo ogni modifica, quando l'app torna
+// in primo piano, quando torna la rete e comunque ogni 30 secondi se visibile
 export function startAutoSync() {
   void syncNow()
   window.addEventListener('online', () => void syncNow())
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') void syncNow()
   })
+  setInterval(() => {
+    if (document.visibilityState === 'visible') void syncNow()
+  }, 30_000)
 }
