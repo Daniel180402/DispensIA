@@ -13,16 +13,25 @@ type Tab = 'pantry' | 'shopping' | 'recipes'
 
 function SyncPill() {
   const { state, lastSync } = useSyncStatus()
-  const dot =
-    state === 'online' ? 'bg-emerald-400' : state === 'syncing' ? 'animate-pulse bg-amber-400' : 'bg-zinc-500'
-  const label =
-    state === 'online'
-      ? 'Sincronizzato'
-      : state === 'syncing'
-        ? 'Sincronizzo…'
-        : lastSync
-          ? `Offline · ${new Date(lastSync).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })}`
-          : 'Offline'
+  const pending = useLiveQuery(() => db.items.where('dirty').equals(1).count(), []) ?? 0
+
+  let dot: string
+  let label: string
+  if (state === 'syncing') {
+    dot = 'animate-pulse bg-amber-400'
+    label = 'Sincronizzo…'
+  } else if (pending > 0) {
+    dot = 'bg-amber-400'
+    label = `Da sincronizzare (${pending})`
+  } else if (state === 'online') {
+    dot = 'bg-emerald-400'
+    label = 'Sincronizzato'
+  } else {
+    dot = 'bg-zinc-500'
+    label = lastSync
+      ? `Offline · ${new Date(lastSync).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })}`
+      : 'Offline'
+  }
   return (
     <button
       className="flex items-center gap-2 rounded-full bg-zinc-900 px-3 py-1.5 text-xs text-zinc-400 active:bg-zinc-800"
