@@ -7,6 +7,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { createServer as createHttpsServer } from 'node:https'
 import { join, relative } from 'node:path'
 import { applyChanges, changesSince, listItems } from './db.js'
+import { suggestRecipes } from './recipes.js'
 
 const PORT = Number(process.env.PORT ?? 3000)
 const HTTPS_PORT = Number(process.env.HTTPS_PORT ?? 3443)
@@ -37,6 +38,23 @@ app.post('/api/sync', async (c) => {
     applied,
     changes: changesSince(Number.isFinite(since) && since > 0 ? since : 0),
   })
+})
+
+app.post('/api/recipes', async (c) => {
+  if (!process.env.ANTHROPIC_API_KEY) {
+    return c.json({ error: 'Chiave API non configurata: imposta ANTHROPIC_API_KEY nel file .env' }, 503)
+  }
+  const items = listItems().filter((i) => i.quantity > 0)
+  if (items.length === 0) {
+    return c.json({ error: 'La dispensa è vuota, aggiungi qualche prodotto prima' }, 400)
+  }
+  try {
+    const result = await suggestRecipes(items)
+    return c.json({ ...result, generatedAt: Date.now() })
+  } catch (err) {
+    console.error('Errore ricette:', err)
+    return c.json({ error: 'Errore nella generazione delle ricette, riprova' }, 502)
+  }
 })
 
 // PWA statica (build di Vite) con fallback SPA
