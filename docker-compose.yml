@@ -4,8 +4,10 @@ services:
     container_name: dispensia
     restart: unless-stopped
     environment:
-      # per le ricette IA: mettila nel file .env accanto a questo compose
-      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      # su Mac conviene puntare all'app Ollama nativa (piu' veloce, usa la GPU):
+      # metti OLLAMA_URL=http://host.docker.internal:11434 nel file .env
+      OLLAMA_URL: ${OLLAMA_URL:-http://ollama:11434}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-qwen2.5:7b}
     ports:
       - '8080:3000'   # HTTP
       - '8443:3443'   # HTTPS (serve per la PWA offline sui telefoni)
@@ -13,5 +15,15 @@ services:
       - dispensia-data:/data
       - ./certs:/certs:ro
 
+  # modello locale per le ricette (scarica il modello con:
+  # docker compose exec ollama ollama pull qwen2.5:7b)
+  ollama:
+    image: ollama/ollama
+    container_name: dispensia-ollama
+    restart: unless-stopped
+    volumes:
+      - ollama-models:/root/.ollama
+
 volumes:
   dispensia-data:
+  ollama-models:
